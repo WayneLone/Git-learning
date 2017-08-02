@@ -1,4 +1,3 @@
-[廖雪峰git教程](https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000)
 # 目录
 1. Git简介
     - 1.1 Git的诞生
@@ -44,7 +43,13 @@ Git有什么特点？简单来说就是：高端大气上档次！
 SVN,CVS等是集中式的版本库控制系统,版本库存在中央服务器上,需要联网才能工作.  
 Git是分布式的版本库控制系统,每个人的电脑上都是完整的版本库.
 ## 2.安装Git
+> 实话实说，Windows是最烂的开发平台，如果不是开发Windows游戏或者在IE里调试页面，一般不推荐用Windows。
 
+1. 下载地址:[https://git-for-windows.github.io/](https://git-for-windows.github.io/)
+2. 打开Git Bash
+3. 设置用户名和email
+    $ git config --global user.name "Zhao-Lian"
+    $ git config --global user.email "lianzhao5678@qq.com"
 ## 3.创建版本库
 ## 4.时光机穿梭
 ### 4.1 版本回退
