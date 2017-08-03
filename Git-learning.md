@@ -311,6 +311,7 @@ Git是分布式的版本库控制系统,每个人的电脑上都是完整的版�
 - `git config --global alias.st status`
 - 每个仓库的配置文件放在.git/config
 - 全局的配置文件放在用户主目录下.gitconfig
+```
 [alias]
     st = status
     co = checkout
@@ -319,6 +320,7 @@ Git是分布式的版本库控制系统,每个人的电脑上都是完整的版�
     unatage = reset HEAD
     last = log -1
     lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+```
 ### 10.3 搭建Git服务器
 ## 11. 期末总结
 完结撒花~~~
