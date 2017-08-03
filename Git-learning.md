@@ -156,20 +156,169 @@ Git是分布式的版本库控制系统,每个人的电脑上都是完整的版�
 - `$ git push origin master`
     + 之后就可以使用此命令进行推送
 ### 5.2 从远程库克隆
+- `git clone`
+    + `git clone git@github.com:KeKe-Li/vue.git`
+    + 克隆一个别人的项目
+    + 地址可以在项目页面找到
+
+> GitHub给出的地址不止一个，还可以用https://github.com/michaelliao/gitskills.git这样的地址。实际上，Git支持多种协议，默认的git://使用ssh，但也可以使用https等其他协议。
+
+> 使用https除了速度慢以外，还有个最大的麻烦是每次推送都必须输入口令，但是在某些只开放http端口的公司内部就无法使用ssh协议而只能用https。
+
 ## 6.分支管理
 ### 6.1 创建与合并分支
+- `git branch`
+    + 查看分支
+- `git branch <name>`
+    + 创建分支
+- `git checkout <name>`
+    + 切换分支
+- `git checkout -b <name>`
+    + 创建 + 切换分支
+- `git merge <name>`
+    + 合并某分支到当前分支
+- `git branch -d <name>`
+    + 删除分支
+
+> 每次提交Git都把它们串成一条时间线，这条时间线就是一个分支。截止到目前，只有一条时间线，在Git里，这个分支叫主分支，即master分支。HEAD严格来说不是指向提交，而是指向master，master才是指向提交的，所以，**HEAD指向的就是当前分支**。
+
+> 因为创建、合并和删除分支非常快，所以Git鼓励你使用分支完成某个任务，合并后再删掉分支，这和直接在master分支上工作效果是一样的，但过程更安全。
+
 ### 6.2 解决冲突
+1. 当合并分支遇到冲突时,需手动修改文件并完成合并
+2. 修改后使用`git add` + `git commit`命令重新提交
+3. 提交完成后删除被合并的分支
+
+- `git log --graph`
+    - 命令可以看到分支合并图
+    - `git log --graph --pretty=oneline --abbrev-commit`
+    - 加参数可以简化显示
 ### 6.3 分支管理策略
+#### fast forward
+> 通常，合并分支时，如果可能，Git会用Fast forward模式，但这种模式下，删除分支后，会丢掉分支信息。
+
+> 如果要强制禁用Fast forward模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息。
+
+- `--no-ff`
+    + `git merge --no-ff -m "merge with no-ff" dev`
+    + 因为本次合并要创建一个新的commit，所以加上-m参数，把commit描述写进去
+
+#### 分支策略
+> 在实际开发中，我们应该按照几个基本原则进行分支管理：
+
+> 首先，master分支应该是非常稳定的，也就是仅用来发布新版本，平时不能在上面干活；
+
+> 那在哪干活呢？干活都在dev分支上，也就是说，dev分支是不稳定的，到某个时候，比如1.0版本发布时，再把dev分支合并到master上，在master分支发布1.0版本；
+
+> 你和你的小伙伴们每个人都在dev分支上干活，每个人都有自己的分支，时不时地往dev分支上合并就可以了。
+
+所以，团队合作的分支看起来就像这样：  
+![](img/branch.png)
 ### 6.4 Bug分支
+- `git stash`
+    + 可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作
+- `git stash list`
+    + 查看stash列表
+- `git stash pop`
+    + 恢复现场的同时删除stash内容
+- `git stash apply`
+    + 只恢复现场,不删除stash内容
+- `gir stash drop`
+    + 删除stash内容
+- 多次stash恢复
+    + 先用`git stash list`查看,再恢复指定stash
+    + `git stash apply stash@{0}`
+
+> 修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；
+
+> 当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场。
+
+
 ### 6.5 Feature分支
+- `git branch -D <name>`
+    - 强行删除一个没有经过合并的分支
+
+> 开发一个新feature，最好新建一个分支；
+
+> 如果要丢弃一个没有被合并过的分支，可以通过`git branch -D <name>`强行删除。
+
 ### 6.6 多人协作
+- `git remote`
+    + 查看远程库的信息
+    + `git remote -v`
+    + 远程库的详细信息,包括抓取和推送地址,如果没有推送权限,就看不到push地址
+#### 推送抓取分支
+> master分支是主分支，因此要时刻与远程同步；
+
+> dev分支是开发分支，团队所有成员都需要在上面工作，所以也需要与远程同步；
+
+> bug分支只用于在本地修复bug，就没必要推到远程了，除非老板要看看你每周到底修复了几个bug；
+
+> feature分支是否推到远程，取决于你是否和你的小伙伴合作在上面开发。
+
+#### 多人协作模式
+1. 首先，可以试图用`git push origin branch-name`推送自己的修改；
+2. 如果推送失败，则因为远程分支比你的本地更新，需要先用`git pull`试图合并；
+3. 如果合并有冲突，则解决冲突，并在本地提交；
+4. 没有冲突或者解决掉冲突后，再用`git push origin branch-name`推送就能成功！
+> 如果git pull提示“`no tracking information`”，则说明本地分支和远程分支的链接关系没有创建，用命令  
+> `git branch --set-upstream branch-name origin/branch-name`。
+
+#### 小结
+- 查看远程库信息，使用`git remote -v`；
+- 本地新建的分支如果不推送到远程，对其他人就是不可见的；
+- 从本地推送分支，使用`git push origin branch-name`，如果推送失败，先用`git pull`抓取远程的新提交；
+- 在本地创建和远程分支对应的分支，使用`git checkout -b branch-name origin/branch-name`，本地和远程分支的名称最好一致；
+- 建立本地分支和远程分支的关联，使用`git branch --set-upstream branch-name origin/branch-name`；
+- 从远程抓取分支，使用`git pull`，如果有冲突，要先处理冲突。
+
 ## 7. 标签管理
+> 发布一个版本时，我们通常先在版本库中打一个标签（tag），这样，就唯一确定了打标签时刻的版本。将来无论什么时候，取某个标签的版本，就是把那个打标签的时刻的历史版本取出来。所以，标签也是版本库的一个快照。  
+
+> tag就是一个让人容易记住的有意义的名字，它跟某个commit绑在一起。
 ### 7.1 创建标签
+- 命令`git tag <name>`用于新建一个标签，默认为`HEAD`，也可以指定一个`commit id`；
+- `git tag -a <tagname> -m "blablabla..."`可以指定标签信息；
+- `git tag -s <tagname> -m "blablabla..."`可以用PGP签名标签；
+- 命令`git tag`可以查看所有标签。
+- `git show <tagname>`可以查看说明文字
+
 ### 7.2 操作标签
+- 命令`git push origin <tagname>`可以推送一个本地标签；
+- 命令`git push origin --tags`可以推送全部未推送过的本地标签；
+- 命令`git tag -d <tagname>`可以删除一个本地标签；
+- 命令`git push origin :refs/tags/<tagname>`可以删除一个远程标签。
+> 已经推送的标签要先从本地删除,再从远程删除
 ## 8. 使用GitHub
+> 一定要从自己的账号下clone仓库，这样你才能推送修改。如果从bootstrap的作者的仓库地址git@github.com:twbs/bootstrap.git克隆，因为没有权限，你将不能推送修改。
 ## 9. 使用码云
 ## 10. 自定义Git
+- `git config --global color.ui true`
+    + 让Git显示颜色,会使命令输出看起来更醒目
 ### 10.1 忽略特殊文件
+#### 忽略文件的原则
+1. 忽略操作系统自动生成的文件，比如缩略图等；
+2. 忽略编译生成的中间文件、可执行文件等，也就是如果一个文件是通过另一个文件自动生成的，那自动生成的文件就没必要放进版本库，比如Java编译产生的.class文件；
+3. 忽略你自己的带有敏感信息的配置文件，比如存放口令的配置文件。
+#### 小结
+- `git add -f <file>`
+    + 强制将已忽略的文件添加至Git
+- `git check-ignore -v App.class`
+    + 检查是哪一条规则忽略了该文件
+- 忽略某些文件时,需要编写`.gitignore`
+- `.gitignore`文件本身要放到版本库里,并且可以对`.gitignore`做版本管理
 ### 10.2 配置别名
+- `git config --global alias.st status`
+- 每个仓库的配置文件放在.git/config
+- 全局的配置文件放在用户主目录下.gitconfig
+[alias]
+    st = status
+    co = checkout
+    ci = commit
+    br = branch
+    unatage = reset HEAD
+    last = log -1
+    lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 ### 10.3 搭建Git服务器
 ## 11. 期末总结
+完结撒花~~~
